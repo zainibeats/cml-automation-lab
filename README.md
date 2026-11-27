@@ -1,10 +1,10 @@
 # CML Automation Lab
 
-An agent skill that builds a small [Cisco Modeling Labs](https://developer.cisco.com/modeling-labs/) lab for practicing network automation on CML-Free: real Cisco IOS devices you can SSH into, plus an Ubuntu automation box with Python (Netmiko, Paramiko) and Ansible ready to use. How you automate them is up to you.
+An agent skill that builds a small [Cisco Modeling Labs](https://developer.cisco.com/modeling-labs/) lab for practicing network automation on CML-Free: real Cisco IOS devices you can SSH into, plus an Ubuntu automation box with Python (Netmiko, Paramiko) and Ansible ready to use.
 
-The skill is a portable [`SKILL.md`](SKILL.md), so any agent that supports skills and MCP servers can run it.
+The skill is a portable [`SKILL.md`](SKILL.md) compatible with any agent that supports skills and MCP servers.
 
-## What You Get
+## Lab Topology and Components
 
 ```
 your LAN ── ext-conn-0 ── unmanaged-switch-0 ─┬─ sw1 (IOSvL2, the default)
@@ -13,7 +13,7 @@ your LAN ── ext-conn-0 ── unmanaged-switch-0 ─┬─ sw1 (IOSvL2, the 
 ```
 
 - **Cisco devices:** one IOSvL2 switch by default, or up to four devices of any Cisco IOS type your CML has an image for. Each gets a hostname, an `admin` user, SSH v2 as the only way in on the vty lines, a management IP from DHCP, and a saved config.
-- **`host`:** Ubuntu 24.04 with a Python virtualenv (`~/venv`, activated at login) containing Netmiko, Paramiko 4.x and Ansible, which includes the `cisco.ios` collection. Useful when your machine can't reach the lab or runs Windows, as a throwaway place to install things, or to schedule jobs inside the lab.
+- **`host`:** Ubuntu 24.04 with a Python virtualenv (`~/venv`, activated at login) containing Netmiko, Paramiko 4.x and Ansible, which includes the `cisco.ios` collection. Useful when your local machine lacks the required network connectivity or runs an unsupported OS, as an isolated environment for installing dependencies, or to schedule jobs inside the lab.
 - **External Connector:** in **bridge mode**, nodes join your LAN and are reachable from your machine. In **NAT mode**, they're reachable only from inside CML, so you work from `host`.
 
 CML-Free runs at most 5 nodes at once. `host` counts towards that and the Unmanaged Switch and External Connector don't, so the lab can hold up to 4 Cisco devices.
@@ -34,9 +34,9 @@ Built with CML 2.10.1 in VMware Workstation on a Linux host, using cml-mcp 0.32.
 
 The skill controls CML through [cml-mcp](https://github.com/xorrkaz/cml-mcp), which needs the `pyats` extra to send console commands. Without it, every configuration step fails.
 
-Copy the `mcpServers` block from [`mcp.example.json`](mcp.example.json) into your agent's MCP config and fill in your CML URL and login. The config contains your CML password, so keep it out of git.
+Copy the `mcpServers` block from [`mcp.example.json`](mcp.example.json) into your agent's MCP config and fill in your CML URL and login. The config contains your CML password; do not commit this to version control.
 
-Restart the agent and ask it to check CML's status to confirm it's connected.
+Restart the agent and request a status check to confirm the connection.
 
 ### 2. Install the skill
 
@@ -48,7 +48,7 @@ Clone this repo, then link or copy it to wherever your agent loads skills from. 
 cp .env.example .env
 ```
 
-Set `LAB_ADMIN_PASSWORD` in `.env`. The skill reads `.env` from the folder you run the agent in, then from this folder, and asks you if neither has it. Your own scripts can read the same file. `.env` is gitignored, so it keeps the password out of the chat and out of git, but not away from the agent, which types it into the device config.
+Set `LAB_ADMIN_PASSWORD` in `.env`. The skill reads `.env` from the folder you run the agent in, then from this folder, and asks you if neither has it. Your own scripts can read the same file. `.env` is gitignored to prevent the password from being committed to version control.
 
 ## Configuration
 
@@ -78,7 +78,7 @@ Lab logins:
 
 ## Usage
 
-Ask your agent to "build me a CML automation lab", or invoke the `cml-automation-lab` skill by name. It asks for the lab title, the Cisco devices and the connector mode, waits for your go-ahead on the plan, then builds, configures and verifies the lab and reports the IP addresses and logins. The first build takes a while: IOSvL2 needs a few minutes to boot, and `host` installs its packages on first boot.
+Instruct the agent to "build me a CML automation lab", or invoke the `cml-automation-lab` skill by name. It asks for the lab title, the Cisco devices and the connector mode, waits for plan approval, then builds, configures and verifies the lab and reports the IP addresses and logins. Note: The initial build may take several minutes while IOSvL2 boots and `host` installs its packages on first boot.
 
 - **Devices, from your machine (bridge mode):** `ssh admin@<device-ip>`. IOSv and IOSvL2 need extra options with modern OpenSSH (see [Troubleshooting](docs/troubleshooting.md)).
 - **`host`:** `ssh cisco@<host-ip>` in bridge mode, or its console in the CML web UI in either mode.
