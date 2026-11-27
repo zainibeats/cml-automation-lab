@@ -40,7 +40,7 @@ Restart the agent and ask it to check CML's status to confirm it's connected.
 
 ### 2. Install the skill
 
-Link or copy this folder to wherever your agent loads skills from. For example, from this folder: `ln -s "$PWD" <skills-dir>/cml-automation-lab`.
+Clone this repo, then link or copy it to wherever your agent loads skills from. For example, from the clone: `ln -s "$PWD" <skills-dir>/cml-automation-lab`.
 
 ### 3. Set the lab password
 
