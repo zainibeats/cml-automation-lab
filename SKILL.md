@@ -136,7 +136,7 @@ On `host`:
       -o KexAlgorithms=+diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa admin@<device IP> exit
   ```
 
-**Bridge-mode failure pattern:** a device gets a DHCP address but can't ping its gateway, or `host` never gets an address. That usually means the hypervisor drops unicast frames addressed to the lab nodes' MAC addresses. Stop and point the user to the README's Troubleshooting section. Don't switch modes without asking.
+**Bridge-mode failure pattern:** a device gets a DHCP address but can't ping its gateway, or `host` never gets an address. That usually means the hypervisor drops unicast frames addressed to the lab nodes' MAC addresses. Stop and point the user to `docs/troubleshooting.md`. Don't switch modes without asking.
 
 ## 7. Report
 
